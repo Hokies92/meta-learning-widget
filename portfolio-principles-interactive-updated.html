@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Architecture Framework</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #2563eb;
+            margin: 30px 0 15px;
+        }
+        h3 {
+            color: #3b82f6;
+            margin: 20px 0 10px;
+        }
+        .subtitle {
+            color: #4b5563;
+            font-style: italic;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .principles-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .principle-column {
+            flex: 1;
+            min-width: 300px;
+            margin: 10px;
+            background-color: #dbeafe;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #3b82f6;
+        }
+        .principle-column h3 {
+            text-align: center;
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3b82f6;
+        }
+        .principle-column ul {
+            padding-left: 20px;
+        }
+        .principle-column li {
+            margin-bottom: 8px;
+        }
+        .synthesis-column {
+            background-color: #bfdbfe;
+        }
+        .arrow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+        }
+        .arrow {
+            color: #3b82f6;
+            font-size: 24px;
+        }
+        .duality {
+            background-color: #eff6ff;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .emergent-properties {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .property-column {
+            flex: 1;
+            min-width: 300px;
+            margin: 10px;
+        }
+        .tab-container {
+            margin: 30px 0;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #3b82f6;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 15px;
+            background-color: #e0e7ff;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .tab.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+            border: 2px solid #3b82f6;
+            border-top: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .implementation-steps {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        .step {
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
+            padding: 15px;
+            background-color: #dbeafe;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+        }
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            line-height: 30px;
+            margin-bottom: 10px;
+        }
+        .step::after {
+            content: "→";
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            color: #3b82f6;
+            font-size: 24px;
+            transform: translateY(-50%);
+        }
+        .step:last-child::after {
+            display: none;
+        }
+        .validation {
+            background-color: #bfdbfe;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 30px 0;
+        }
+        .validation h3 {
+            text-align: center;
+            margin-top: 0;
+        }
+        .validation ul {
+            columns: 2;
+            column-gap: 30px;
+        }
+        .capability-map {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .capability-map th {
+            background-color: #3b82f6;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        .capability-map td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .capability-map tr:nth-child(even) {
+            background-color: #f2f5ff;
+        }
+        .capability-map tr:hover {
+            background-color: #dbeafe;
+        }
+        .capability-category {
+            background-color: #eff6ff !important;
+            font-weight: bold;
+        }
+        .capability-level {
+            text-align: center;
+            width: 100px;
+        }
+        .capability-level span {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 3px;
+        }
+        .level-high {
+            background-color: #16a34a;
+        }
+        .level-medium {
+            background-color: #eab308;
+        }
+        .level-low {
+            background-color: #dc2626;
+        }
+        .capability-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        .capability-group {
+            width: 200px;
+            margin: 15px;
+            text-align: center;
+        }
+        .capability-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        .capability-circle:hover {
+            transform: scale(1.05);
+        }
+        .capability-circle.strategic {
+            background-color: #1e40af;
+        }
+        .capability-circle.operational {
+            background-color: #3b82f6;
+        }
+        .capability-circle.tactical {
+            background-color: #60a5fa;
+        }
+        .capability-connection {
+            display: flex;
+            justify-content: center;
+            margin-top: -20px;
+            margin-bottom: -20px;
+            position: relative;
+            z-index: -1;
+        }
+        .capability-connection-line {
+            width: 5px;
+            height: 40px;
+            background-color: #3b82f6;
+        }
+        .capability-name {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        @media (max-width: 768px) {
+            .principles-container {
+                flex-direction: column;
+            }
+            .arrow-container {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+            .validation ul {
+                columns: 1;
+            }
+            .tab {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Portfolio Architecture Framework</h1>
+            <p class="subtitle">Creating purposeful value through organized relationships</p>
+        </header>
+
+        <div class="card">
+            <h2>Core Definition</h2>
+            <p>A portfolio is a bounded system where value emerges from purposefully organized components guided by clear intent.</p>
+        </div>
+
+        <h2>Principles Analysis</h2>
+        <div class="principles-container">
+            <div class="principle-column">
+                <h3>What Makes a Portfolio</h3>
+                <ul>
+                    <li>Bounded collection of components</li>
+                    <li>Intentional selection criteria</li>
+                    <li>Component relationships</li>
+                    <li>Measurable attributes</li>
+                    <li>Management framework</li>
+                    <li>Purpose alignment</li>
+                    <li>Risk distribution</li>
+                    <li>Performance monitoring</li>
+                </ul>
+            </div>
+            <div class="arrow-container">
+                <span class="arrow">→</span>
+            </div>
+            <div class="principle-column">
+                <h3>What Gives "Portfolioness"</h3>
+                <ul>
+                    <li>Systematic organization</li>
+                    <li>Purposeful composition</li>
+                    <li>Relationship dynamics</li>
+                    <li>Attribute measurement</li>
+                    <li>Active governance</li>
+                    <li>Goal orientation</li>
+                    <li>Risk balancing</li>
+                    <li>Performance tracking</li>
+                </ul>
+            </div>
+            <div class="arrow-container">
+                <span class="arrow">→</span>
+            </div>
+            <div class="principle-column synthesis-column">
+                <h3>Synthesized Principles</h3>
+                <ul>
+                    <li>Bounded Systematic Organization</li>
+                    <li>Purposeful Dynamic Composition</li>
+                    <li>Interactive Component Relationships</li>
+                    <li>Measurable System Properties</li>
+                    <li>Active Adaptive Management</li>
+                    <li>Goal-Oriented Evolution</li>
+                    <li>Multi-dimensional Balance</li>
+                    <li>Emergent Synergies</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="duality">
+            <h3>Portfolio Dualities</h3>
+            <p>Structure vs. Management | Components vs. System | Measurable vs. Emergent</p>
+        </div>
+
+        <div class="tab-container">
+            <div class="tabs">
+                <div class="tab active" onclick="openTab(event, 'tab1')">Framework</div>
+                <div class="tab" onclick="openTab(event, 'tab2')">Implementation</div>
+                <div class="tab" onclick="openTab(event, 'tab3')">Properties</div>
+                <div class="tab" onclick="openTab(event, 'tab4')">Capabilities Example</div>
+            </div>
+
+            <div id="tab1" class="tab-content active">
+                <h3>Universal Framework</h3>
+                <div class="principles-container">
+                    <div class="principle-column">
+                        <h3>1. Foundation</h3>
+                        <ul>
+                            <li><strong>Purpose:</strong> Why it exists + What it achieves</li>
+                            <li><strong>Boundary:</strong> What belongs + What doesn't</li>
+                            <li><strong>Identity:</strong> Core nature + Essential character</li>
+                        </ul>
+                    </div>
+                    <div class="principle-column">
+                        <h3>2. Organization</h3>
+                        <ul>
+                            <li><strong>Selection:</strong> Right components + Right reasons</li>
+                            <li><strong>Patterns:</strong> How elements connect + work together</li>
+                            <li><strong>Balance:</strong> How system maintains harmony</li>
+                        </ul>
+                    </div>
+                    <div class="principle-column">
+                        <h3>3. Value Creation</h3>
+                        <ul>
+                            <li><strong>Emergence:</strong> How value appears + grows</li>
+                            <li><strong>Adaptation:</strong> How system evolves + learns</li>
+                            <li><strong>Sustenance:</strong> How value endures + compounds</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab2" class="tab-content">
+                <h3>Implementation Guide</h3>
+                <div class="implementation-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h4>Define Purpose</h4>
+                        <ul style="text-align: left;">
+                            <li>Set clear objectives</li>
+                            <li>Create boundaries</li>
+                            <li>Establish identity</li>
+                        </ul>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h4>Select Components</h4>
+                        <ul style="text-align: left;">
+                            <li>Choose fitting elements</li>
+                            <li>Ensure value contribution</li>
+                            <li>Maintain system balance</li>
+                        </ul>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h4>Build Relationships</h4>
+                        <ul style="text-align: left;">
+                            <li>Connect meaningfully</li>
+                            <li>Create value paths</li>
+                            <li>Enable growth patterns</li>
+                        </ul>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h4>Manage System</h4>
+                        <ul style="text-align: left;">
+                            <li>Measure performance</li>
+                            <li>Adapt as needed</li>
+                            <li>Maintain coherence</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab3" class="tab-content">
+                <h3>Emergent Properties Comparison</h3>
+                <div class="emergent-properties">
+                    <div class="principle-column property-column">
+                        <h3>American Funds Portfolio</h3>
+                        <ul>
+                            <li>Global Market Responsiveness</li>
+                            <li>Risk-Adjusted Growth Optimization</li>
+                            <li>Professional Management Leverage</li>
+                            <li>Scale Efficiency</li>
+                            <li>Market Access Breadth</li>
+                            <li>Regulatory Compliance Framework</li>
+                            <li>Investment Philosophy Consistency</li>
+                        </ul>
+                    </div>
+                    <div class="principle-column property-column">
+                        <h3>Generic Portfolio</h3>
+                        <ul>
+                            <li>Value Preservation</li>
+                            <li>Risk Distribution</li>
+                            <li>Performance Measurement</li>
+                            <li>Component Synergy</li>
+                            <li>Management Effectiveness</li>
+                            <li>Goal Achievement Capability</li>
+                            <li>Adaptation Capacity</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab4" class="tab-content">
+                <h3>Enterprise Capability Portfolio Example</h3>
+                <p>This example demonstrates how the Portfolio Framework can be applied to organizational capabilities rather than assets.</p>
+                
+                <div class="capability-diagram">
+                    <div class="capability-group">
+                        <div class="capability-circle strategic">
+                            <div>Strategic</div>
+                            <div>Capabilities</div>
+                        </div>
+                        <div class="capability-name">Vision & Direction</div>
+                    </div>
+                    
+                    <div class="capability-connection">
+                        <div class="capability-connection-line"></div>
+                    </div>
+                    
+                    <div class="capability-group">
+                        <div class="capability-circle operational">
+                            <div>Operational</div>
+                            <div>Capabilities</div>
+                        </div>
+                        <div class="capability-name">Core Functions</div>
+                    </div>
+                    
+                    <div class="capability-connection">
+                        <div class="capability-connection-line"></div>
+                    </div>
+                    
+                    <div class="capability-group">
+                        <div class="capability-circle tactical">
+                            <div>Tactical</div>
+                            <div>Capabilities</div>
+                        </div>
+                        <div class="capability-name">Execution Excellence</div>
+                    </div>
+                </div>
+                
+                <table class="capability-map">
+                    <thead>
+                        <tr>
+                            <th>Capability Category</th>
+                            <th>Capability</th>
+                            <th>Description</th>
+                            <th>Maturity Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="capability-category">
+                            <td colspan="4">Strategic Capabilities</td>
+                        </tr>
+                        <tr>
+                            <td>Innovation</td>
+                            <td>Market Sensing</td>
+                            <td>Ability to detect and interpret market signals, emerging trends, and potential disruptions</td>
+                            <td class="capability-level">
+                                <span class="level-high"></span>
+                                <span class="level-high"></span>
+                                <span class="level-high"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Strategy</td>
+                            <td>Portfolio Balancing</td>
+                            <td>Capability to optimize resource allocation across initiatives based on strategic priorities</td>
+                            <td class="capability-level">
+                                <span class="level-high"></span>
+                                <span class="level-high"></span>
+                                <span class="level-medium"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Leadership</td>
+                            <td>Adaptive Decision Making</td>
+                            <td>Ability to make effective decisions in uncertain and complex environments</td>
+                            <td class="capability-level">
+                                <span class="level-high"></span>
+                                <span class="level-medium"></span>
+                                <span class="level-medium"></span>
+                            </td>
+                        </tr>
+                        
+                        <tr class="capability-category">
+                            <td colspan="4">Operational Capabilities</td>
+                        </tr>
+                        <tr>
+                            <td>Process</td>
+                            <td>Continuous Improvement</td>
+                            <td>Systematic approach to enhancing processes, products, and services</td>
+                            <td class="capability-level">
+                                <span class="level-high"></span>
+                                <span class="level-high"></span>
+                                <span class="level-medium"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Technology</td>
+                            <td>Digital Integration</td>
+                            <td>Ability to leverage technology across functions to create seamless experiences</td>
+                            <td class="capability-level">
+                                <span class="level-medium"></span>
+                                <span class="level-medium"></span>
+                                <span class="level-low"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Knowledge</td>
+                            <td>Organizational Learning</td>
+                            <td>Capability to capture, share, and apply knowledge across the organization</td>
+                            <td class="capability-level">
+                                <span class="level-high"></span>
+                                <span class="level-medium"></span>
+                                <span class="level-low"></span>
+                            </td>
+                        </tr>
+                        
+                        <tr class="capability-category">
+                            <td colspan="4">Tactical Capabilities</td>
+                        </tr>
+                        <tr>
+                            <td>Execution</td>
+                            <td>Resource Orchestration</td>
+                            <td>Ability to deploy and coordinate resources effectively to achieve outcomes</td>
+                            <td class="capability-level">
+                                <span class="level-high"></span>
+                                <span class="level-high"></span>
+                                <span class="level-medium"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Collaboration</td>
+                            <td>Cross-Functional Integration</td>
+                            <td>Capability to work across organizational boundaries to solve problems</td>
+                            <td class="capability-level">
+                                <span class="level-medium"></span>
+                                <span class="level-medium"></span>
+                                <span class="level-low"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Adaptability</td>
+                            <td>Change Responsiveness</td>
+                            <td>Ability to adjust tactics quickly in response to internal and external changes</td>
+                            <td class="capability-level">
+                                <span class="level-high"></span>
+                                <span class="level-medium"></span>
+                                <span class="level-medium"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="card">
+                    <h4>Portfolio Analysis</h4>
+                    <p>This capability portfolio demonstrates the application of our framework principles:</p>
+                    <ul>
+                        <li><strong>Purpose:</strong> Capabilities are organized to achieve organizational excellence and adaptability</li>
+                        <li><strong>Boundaries:</strong> Clear delineation between strategic, operational, and tactical capabilities</li>
+                        <li><strong>Interactive Relationships:</strong> Capabilities connect across levels to create an integrated system</li>
+                        <li><strong>Measurement:</strong> Maturity levels provide clear assessment of capability health</li>
+                        <li><strong>Value Creation:</strong> Capabilities work together to create organizational resilience and competitive advantage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="validation">
+            <h3>Validation Checklist</h3>
+            <ul>
+                <li>Does it serve its purpose?</li>
+                <li>Do components work together?</li>
+                <li>Does value emerge?</li>
+                <li>Can it adapt?</li>
+                <li>Is it sustainable?</li>
+                <li>Are boundaries clear?</li>
+                <li>Is balance maintained?</li>
+                <li>Is growth enabled?</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Core Capability Requirements</h2>
+            <p style="text-align: center; font-weight: bold;">Systematic development of capabilities to deliver outcomes while managing complexity</p>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            // Declare variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+
+            // Get all elements with class="tab" and remove the class "active"
+            tablinks = document.getElementsByClassName("tab");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>

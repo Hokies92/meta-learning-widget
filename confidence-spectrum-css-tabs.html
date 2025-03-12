@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Confidence Spectrum Model</title>
+    <style>
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #3b5998, #2d4373);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        
+        .header p {
+            margin-top: 10px;
+            font-style: italic;
+            opacity: 0.9;
+        }
+        
+        /* CSS-only Tabs */
+        .tabs {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .tab-input {
+            position: absolute;
+            opacity: 0;
+            z-index: -1;
+        }
+        
+        .tab-labels {
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        
+        .tab-label {
+            flex: 1;
+            cursor: pointer;
+            max-width: 100%;
+            background: #f1f3f5;
+            padding: 1rem;
+            font-weight: bold;
+            transition: background 0.1s;
+            text-align: center;
+            color: #666;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-label:hover {
+            background: #e9ecef;
+            color: #3b5998;
+        }
+        
+        .tab-content {
+            background: white;
+            border-radius: 0 0 8px 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            min-height: 100%;
+        }
+        
+        /* Show the specific tab content when the corresponding input is checked */
+        .tab-input:checked + .tab-label {
+            background: #3b5998;
+            color: white;
+            border-bottom-color: #e94560;
+        }
+        
+        .tab-input:checked + .tab-label + .tab-content {
+            display: block;
+        }
+        
+        /* Animations for tab content */
+        .tab-input:checked + .tab-label + .tab-content {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Content Styles */
+        h2 {
+            color: #3b5998;
+            border-bottom: 2px solid #e1e4e8;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h3 {
+            color: #3b5998;
+            margin: 25px 0 15px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        ul {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid #3b5998;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .accent-card {
+            border-left-color: #e94560;
+        }
+        
+        .accent-card h3 {
+            color: #e94560;
+        }
+        
+        .comparison {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .comparison-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .blue-box {
+            background-color: #ebf8ff;
+            border-left: 5px solid #3182ce;
+        }
+        
+        .red-box {
+            background-color: #fff5f5;
+            border-left: 5px solid #e53e3e;
+        }
+        
+        .box-header {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .box-item {
+            background-color: rgba(255,255,255,0.7);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .metric {
+            flex: 1;
+            min-width: 200px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-top: 4px solid #3b5998;
+        }
+        
+        .metric-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3b5998;
+            margin: 5px 0;
+        }
+        
+        .metric-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .spectrum {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .spectrum-bar {
+            height: 60px;
+            background: linear-gradient(to right, #4299e1, #38b2ac, #68d391, #f6e05e, #f6ad55);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .spectrum-labels {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .spectrum-label {
+            width: 20%;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .spectrum-values {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .spectrum-value {
+            width: 20%;
+            text-align: center;
+        }
+        
+        .steps {
+            margin: 30px 0;
+        }
+        
+        .step {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 5px solid #e94560;
+        }
+        
+        .step-title {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .step-number {
+            background-color: #e94560;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        
+        /* Feature Animations */
+        .animation-container {
+            height: 250px;
+            position: relative;
+            margin: 30px 0;
+            background-color: #f5f9ff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* OVERVIEW ANIMATION */
+        .overview-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .overview-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        .overview-text {
+            font-weight: bold;
+            font-size: 24px;
+            color: #3b5998;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* OBJECT ANIMATION */
+        .object-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .ruler {
+            width: 70%;
+            height: 40px;
+            background: linear-gradient(to right, #4299e1, #38b2ac, #68d391, #f6e05e, #f6ad55);
+            position: relative;
+            border-radius: 5px;
+        }
+        
+        .ruler::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background: repeating-linear-gradient(90deg, #fff, #fff 9%, transparent 9%, transparent 10%);
+            top: -10px;
+        }
+        
+        .ruler-marker {
+            position: absolute;
+            width: 10px;
+            height: 60px;
+            background-color: #e94560;
+            top: -25px;
+            left: 20%;
+            animation: moveMarker 8s infinite;
+            z-index: 2;
+            border-radius: 3px;
+        }
+        
+        @keyframes moveMarker {
+            0%, 100% { left: 10%; }
+            25% { left: 30%; }
+            50% { left: 50%; }
+            75% { left: 70%; }
+        }
+        
+        /* ENTITY ANIMATION */
+        .entity-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .entity-circle {
+            width: 150px;
+            height: 150px;
+            background-color: #3b5998;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            padding: 20px;
+            animation: pulse-grow 4s infinite;
+        }
+        
+        @keyframes pulse-grow {
+            0%, 100% { transform: scale(1); background-color: #3b5998; }
+            50% { transform: scale(1.2); background-color: #e94560; }
+        }
+        
+        /* PROCESS ANIMATION */
+        .process-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .process-flow {
+            display: flex;
+            align-items: center;
+            width: 80%;
+            position: relative;
+        }
+        
+        .process-step {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #3b5998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin: 0 10px;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+        
+        .process-flow .step1 { animation: highlight 10s infinite; }
+        .process-flow .step2 { animation: highlight 10s infinite 2s; }
+        .process-flow .step3 { animation: highlight 10s infinite 4s; }
+        .process-flow .step4 { animation: highlight 10s infinite 6s; }
+        .process-flow .step5 { animation: highlight 10s infinite 8s; }
+        
+        .process-connection {
+            flex-grow: 1;
+            height: 5px;
+            background-color: #ccc;
+            position: relative;
+        }
+        
+        @keyframes highlight {
+            0%, 20%, 100% { transform: scale(1); background-color: #3b5998; }
+            5%, 15% { transform: scale(1.3); background-color: #e94560; }
+        }
+        
+        /* STRATEGY ANIMATION */
+        .strategy-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .strategy-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 70%;
+        }
+        
+        .strategy-left, .strategy-right {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .strategy-left {
+            background-color: #3182ce;
+            transform-origin: center right;
+            animation: grow-shrink 4s infinite;
+        }
+        
+        .strategy-right {
+            background-color: #e53e3e;
+            transform-origin: center left;
+            animation: shrink-grow 4s infinite;
+        }
+        
+        .strategy-arrow {
+            height: 20px;
+            flex-grow: 1;
+            background-color: transparent;
+            position: relative;
+            margin: 0 10px;
+        }
+        
+        .strategy-arrow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #3b5998;
+            transform: translateY(-50%);
+        }
+        
+        .strategy-arrow::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -5px;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 15px solid #3b5998;
+        }
+        
+        @keyframes grow-shrink {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.7); }
+        }
+        
+        @keyframes shrink-grow {
+            0%, 100% { transform: scale(0.7); }
+            50% { transform: scale(1); }
+        }
+        
+        /* OPERATING MODEL ANIMATION */
+        .operating-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            padding: 30px;
+        }
+        
+        .department {
+            height: 40px;
+            background-color: #3182ce;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            width: 70%;
+        }
+        
+        .department:nth-child(1) { animation: sync 4s infinite; }
+        .department:nth-child(2) { animation: sync 4s infinite 0.3s; }
+        .department:nth-child(3) { animation: sync 4s infinite 0.6s; }
+        
+        @keyframes sync {
+            0%, 100% { width: 50%; }
+            50% { width: 90%; }
+        }
+        
+        /* SYSTEM ANIMATION */
+        .system-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cycle {
+            width: 150px;
+            height: 150px;
+            border: 10px solid #3b5998;
+            border-radius: 50%;
+            position: relative;
+            animation: rotate 10s linear infinite;
+        }
+        
+        .cycle-dot {
+            width: 30px;
+            height: 30px;
+            background-color: #e94560;
+            border-radius: 50%;
+            position: absolute;
+        }
+        
+        .dot1 { top: -15px; left: calc(50% - 15px); }
+        .dot2 { right: -15px; top: calc(50% - 15px); }
+        .dot3 { bottom: -15px; left: calc(50% - 15px); }
+        .dot4 { left: -15px; top: calc(50% - 15px); }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 767px) {
+            .tab-labels {
+                flex-direction: column;
+            }
+            
+            .tab-label {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .comparison {
+                flex-direction: column;
+            }
+            
+            .comparison-box {
+                width: 100%;
+            }
+            
+            .process-flow {
+                flex-direction: column;
+                height: 80%;
+            }
+            
+            .process-connection {
+                width: 5px;
+                height: 20px;
+            }
+            
+            .strategy-container {
+                flex-direction: column;
+                height: 80%;
+            }
+            
+            .strategy-arrow {
+                width: 20px;
+                height: 40px;
+                margin: 10px 0;
+            }
+            
+            .strategy-arrow::before {
+                width: 4px;
+                height: 100%;
+                left: 50%;
+                top: 0;
+                transform: translateX(-50%);
+            }
+            
+            .strategy-arrow::after {
+                left: 50%;
+                bottom: -5px;
+                top: auto;
+                transform: translateX(-50%);
+                border-left: 10px solid transparent;
+                border-right: 10px solid transparent;
+                border-top: 15px solid #3b5998;
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>The Confidence Spectrum Model</h1>
+        <p>A New Paradigm for Business Evolution</p>
+    </div>
+    
+    <div class="tabs">
+        <!-- Overview Tab -->
+        <input type="radio" name="tabs" id="tab-overview" class="tab-input" checked>
+        <label for="tab-overview" class="tab-label">Overview</label>
+        <div class="tab-content">
+            <h2>The Confidence Spectrum Model: A Fundamental Shift</h2>
+            
+            <p>The Confidence Spectrum Model (CSM) is not just a framework—it is a fundamentally different way of structuring how businesses sell, package, and scale their value creation. It does not sit alongside traditional bureaucratic operating models (BOMs); it replaces them.</p>
+            
+            <div class="animation-container">
+                <div class="overview-animation">
+                    <div class="overview-icon">🚀</div>
+                    <div class="overview-text">The Architecture of Business Evolution</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Definition of the Confidence Spectrum</h3>
+                <p>The Confidence Spectrum is an ordered scale from Predictable (-1.00) to Possible (+0.75), mapping how business offerings shift from fixed, low-trust sales to high-trust strategic engagements. It quantifies the intangible nature of trust and confidence in sales into structured levels.</p>
+            </div>
+            
+            <div class="comparison">
+                <div class="comparison-box blue-box">
+                    <div class="box-header">Bureaucratic Operating Model</div>
+                    <div class="box-item">Manages resources through control, structure, and repeatability</div>
+                    <div class="box-item">Treats products, services, and customers as fixed categories</div>
+                    <div class="box-item">Measures business maturity by internal process optimization</div>
+                    <div class="box-item">Optimizes for repeatability within existing constraints</div>
+                    <div class="box-item">Separates functions into silos</div>
+                </div>
+                <div class="comparison-box red-box">
+                    <div class="box-header">Confidence Spectrum Model</div>
+                    <div class="box-item">Allocates resources dynamically based on trust and customer readiness</div>
+                    <div class="box-item">Treats offerings as dynamic states that shift based on trust</div>
+                    <div class="box-item">Measures business maturity by ability to sell at higher confidence levels</div>
+                    <div class="box-item">Optimizes for progression and trust to dissolve constraints</div>
+                    <div class="box-item">Synchronizes every function under a unified confidence level</div>
+                </div>
+            </div>
+            
+            <h3>Exploring the Confidence Spectrum</h3>
+            
+            <div class="spectrum">
+                <div class="spectrum-bar"></div>
+                <div class="spectrum-values">
+                    <div class="spectrum-value">-1.00</div>
+                    <div class="spectrum-value">-0.50</div>
+                    <div class="spectrum-value">0.00</div>
+                    <div class="spectrum-value">+0.50</div>
+                    <div class="spectrum-value">+0.75</div>
+                </div>
+                <div class="spectrum-labels">
+                    <div class="spectrum-label">Predictable</div>
+                    <div class="spectrum-label">Projectable</div>
+                    <div class="spectrum-label">Probable</div>
+                    <div class="spectrum-label">Plausible</div>
+                    <div class="spectrum-label">Possible</div>
+                </div>
+            </div>
+            
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">Why It Matters</div>
+                    <div class="metric-value">Quantifies Trust</div>
+                    <div class="metric-desc">Converts intangible trust into measurable structure</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Key Property</div>
+                    <div class="metric-value">Sequential Evolution</div>
+                    <div class="metric-desc">Forces businesses through structured progression</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Critical Insight</div>
+                    <div class="metric-value">Strategic Adaptation</div>
+                    <div class="metric-desc">Requires active participation to evolve</div>
+                </div>
+            </div>
+            
+            <div class="card accent-card">
+                <h3>🔥 This is not a sales model. This is the architecture of business evolution. 🚀</h3>
+                <p>The Confidence Spectrum Model represents a fundamental paradigm shift in how businesses operate, not just how they sell. It creates a unifying framework that aligns sales, finance, delivery, and strategy around confidence-based engagement. The choice is not whether to implement the Confidence Spectrum Model—it is whether you can afford to stay bureaucratic.</p>
+            </div>
+        </div>
+        
+        <!-- Object Tab -->
+        <input type="radio" name="tabs" id="tab-object" class="tab-input">
+        <label for="tab-object" class="tab-label">As an Object</label>
+        <div class="tab-content">
+            <h2>The Confidence Spectrum as an Object</h2>
+            
+            <div class="animation-container">
+                <div class="object-animation">
+                    <div class="ruler">
+                        <div class="ruler-marker"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Definition</h3>
+                <p>The Confidence Spectrum is a diagnostic and classification tool for positioning business models. It is a calibrated measurement scale that defines where a business is positioned in the market, not by its internal complexity but by how much trust customers place in it.</p>
+            </div>
+            
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">Key Property</div>
+                    <div class="metric-value">Fixed Structure</div>
+                    <div class="metric-desc">Predictable → Projectable → Probable → Plausible → Possible</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Key Property</div>
+                    <div class="metric-value">Measurable Stages</div>
+                    <div class="metric-desc">Defines confidence levels in business transactions</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Key Property</div>
+                    <div class="metric-value">Strategic Anchor</div>
+                    <div class="metric-desc">Foundation for packaging and pricing strategies</div>
+                </div>
+            </div>
+            
+            <h3>How This Functions as an Object</h3>
+            
+            <ul>
+                <li><strong>Market Trust Ceiling:</strong> A company cannot sell at a higher confidence level than the market grants it.</li>
+                <li><strong>Level-Specific Requirements:</strong> Each confidence level requires a different sales motion, financial model, and customer engagement structure.</li>
+                <li><strong>Reality Confrontation:</strong> The Confidence Spectrum forces a business to confront its market reality—it is not about what the company believes it sells, but about what the customer believes they are buying.</li>
+            </ul>
+            
+            <div class="comparison">
+                <div class="comparison-box blue-box">
+                    <div class="box-header">Bureaucratic View of Objects</div>
+                    <div class="box-item">Products are defined by specifications</div>
+                    <div class="box-item">Services are defined by deliverables</div>
+                    <div class="box-item">Customers are defined by segmentation</div>
+                    <div class="box-item">Categories are fixed and predefined</div>
+                </div>
+                <div class="comparison-box red-box">
+                    <div class="box-header">Confidence Spectrum View of Objects</div>
+                    <div class="box-item">Products are trust vehicles</div>
+                    <div class="box-item">Services are confidence accelerators</div>
+                    <div class="box-item">Customers are confidence partners</div>
+                    <div class="box-item">Categories are dynamic and evolving</div>
+                </div>
+            </div>
+            
+            <h3>Analogy</h3>
+            <p>The Confidence Spectrum as an Object is like a spectrum of light where each wavelength represents a different business model (from SKU-based to transformation-based).</p>
+            
+            <p><strong>📌 Insight:</strong> As an object, the Confidence Spectrum is a diagnostic and classification tool for positioning business models.</p>
+        </div>
+        
+        <!-- Entity Tab -->
+        <input type="radio" name="tabs" id="tab-entity" class="tab-input">
+        <label for="tab-entity" class="tab-label">As an Entity</label>
+        <div class="tab-content">
+            <h2>The Confidence Spectrum as an Entity</h2>
+            
+            <div class="animation-container">
+                <div class="entity-animation">
+                    <div class="entity-circle">Business Maturity</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Definition</h3>
+                <p>The Confidence Spectrum is a self-adaptive entity that grows with the maturity of a business, influencing its sales, finance, and customer engagement models. Unlike static sales frameworks, it requires active participation—companies must deliberately shift confidence levels to evolve.</p>
+            </div>
+            
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">Key Property</div>
+                    <div class="metric-value">Measurable</div>
+                    <div class="metric-desc">Can be measured, mapped, and acted upon</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Key Property</div>
+                    <div class="metric-value">State-Dependent</div>
+                    <div class="metric-desc">Exists differently based on business positioning</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Key Property</div>
+                    <div class="metric-value">Adaptable</div>
+                    <div class="metric-desc">Requires continuous evolution through the levels</div>
+                </div>
+            </div>
+            
+            <div class="comparison">
+                <div class="comparison-box blue-box">
+                    <div class="box-header">Bureaucratic View of
